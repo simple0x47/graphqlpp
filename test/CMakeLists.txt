@@ -14,7 +14,8 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-add_executable(graphqlpp_test)
+add_executable(graphqlpp_test
+        graphqlpp/result_test.cpp)
 
 target_link_libraries(graphqlpp_test graphqlpp GTest::gtest_main)
 

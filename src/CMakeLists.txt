@@ -1,2 +1,3 @@
-add_library(graphqlpp)
+add_library(graphqlpp
+        graphqlpp/result.h)
 
