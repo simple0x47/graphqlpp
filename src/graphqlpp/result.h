@@ -4,6 +4,7 @@
 #define RESULT_H
 #include <memory>
 
+namespace graphqlpp {
 /// \brief Rust's Result type. Indicates whether an operation was a success or a
 /// failure by containing two possible values.
 /// Its inner value can only be accessed once since the value's ownership
@@ -66,5 +67,6 @@ class Result {
     is_ok_ = is_ok;
   }
 };
+}  // namespace graphqlpp
 
 #endif  // RESULT_H

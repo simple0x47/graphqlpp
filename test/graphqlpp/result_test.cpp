@@ -4,6 +4,8 @@
 
 #include <gtest/gtest.h>
 
+using namespace graphqlpp;
+
 class NoDefaultConstructor {
  public:
   explicit NoDefaultConstructor(int x) {}
