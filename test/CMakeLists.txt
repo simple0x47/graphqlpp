@@ -15,7 +15,8 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 add_executable(graphqlpp_test
-        graphqlpp/result_test.cpp)
+        graphqlpp/result_test.cpp
+        graphqlpp/language/tokenization/tokenizer_test.cpp)
 
 target_link_libraries(graphqlpp_test graphqlpp GTest::gtest_main)
 
