@@ -34,6 +34,8 @@ Result<std::vector<Token>, TokenizeError> tokenize(
                       std::nullopt, std::nullopt));
   }
 
+  size_t token_start_line = 1;
+  size_t token_start_column = 1;
   long token_start = 0;
   TokenType token_type;
   bool is_token_end = false;
@@ -45,6 +47,9 @@ Result<std::vector<Token>, TokenizeError> tokenize(
       return invalid_source_character_error(line, column);
     }
 
+    // Punctuator
+
+    // Line terminator
     auto [is_line_terminator, is_carriage_return_and_new_line] =
         is_source_character_a_line_terminator(source, i);
 
@@ -68,8 +73,12 @@ Result<std::vector<Token>, TokenizeError> tokenize(
       tokens.push_back(Token{.value_ = std::vector(source.begin() + token_start,
                                                    source.begin() + i + 1),
                              .type_ = token_type,
-                             .ignored_ = is_token_type_ignored(token_type)});
+                             .ignored_ = is_token_type_ignored(token_type),
+                             .line_ = token_start_line,
+                             .column_ = token_start_column});
 
+      token_start_line = line;
+      token_start_column = column;
       token_start = i + 1;
       is_token_end = false;
     }

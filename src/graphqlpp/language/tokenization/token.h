@@ -26,10 +26,15 @@ struct Token {
   std::vector<char32_t> value_;
   TokenType type_;
   bool ignored_;
+  /// \brief Line where the token starts.
+  size_t line_;
+  /// \brief Column where the token starts.
+  size_t column_;
 
   bool operator==(const Token& other) const {
-    return (ignored_ == other.ignored_ && type_ == other.type_ &&
-            std::ranges::equal(value_, other.value_));
+    return ignored_ == other.ignored_ && type_ == other.type_ &&
+           line_ == other.line_ && column_ == other.column_ &&
+           std::ranges::equal(value_, other.value_);
   }
 };
 }  // namespace graphqlpp::language::tokenization

@@ -76,6 +76,9 @@ TEST_P(TokenizeDetectLineTerminatorsTestFixture,
   const auto [source, expected_tokens] = GetParam();
 
   Result<std::vector<Token>, TokenizeError> r = tokenize(source);
+
+  ASSERT_TRUE(r.IsOk());
+
   std::unique_ptr<std::vector<Token>> tokens = r.Unwrap();
 
   ASSERT_EQ(expected_tokens.size(), tokens->size());
@@ -96,13 +99,19 @@ INSTANTIATE_TEST_SUITE_P(
         std::vector<Token>{
             Token{.value_ = std::vector<char32_t>{CARRIAGE_RETURN, NEW_LINE},
                   .type_ = TokenType::LINE_TERMINATOR,
-                  .ignored_ = true},
+                  .ignored_ = true,
+                  .line_ = 1,
+                  .column_ = 1},
             Token{.value_ = std::vector<char32_t>{CARRIAGE_RETURN, NEW_LINE},
                   .type_ = TokenType::LINE_TERMINATOR,
-                  .ignored_ = true},
+                  .ignored_ = true,
+                  .line_ = 2,
+                  .column_ = 1},
             Token{.value_ = std::vector<char32_t>{CARRIAGE_RETURN, NEW_LINE},
                   .type_ = TokenType::LINE_TERMINATOR,
-                  .ignored_ = true}})));
+                  .ignored_ = true,
+                  .line_ = 3,
+                  .column_ = 1}})));
 
 class IsTokenTypeIgnoredTestFixture
     : public testing::TestWithParam<std::tuple<TokenType, bool>> {};
@@ -125,3 +134,65 @@ INSTANTIATE_TEST_SUITE_P(
                     std::make_tuple(TokenType::LINE_TERMINATOR, true),
                     std::make_tuple(TokenType::COMMENT, true),
                     std::make_tuple(TokenType::COMMA, true)));
+
+class TokenizeDetectPunctuatorTestFixture
+    : public testing::TestWithParam<
+          std::tuple<std::vector<char32_t>, std::vector<Token>>> {};
+
+TEST_P(TokenizeDetectPunctuatorTestFixture,
+       IsSourceCharacterAPunctuator_DetectPunctuator) {
+  auto [s, expected_tokens] = GetParam();
+
+  Result<std::vector<Token>, TokenizeError> r = tokenize(s);
+
+  ASSERT_TRUE(r.IsOk());
+
+  std::unique_ptr<std::vector<Token>> tokens = r.Unwrap();
+
+  ASSERT_EQ(expected_tokens.size(), tokens->size());
+
+  for (size_t i = 0; i < expected_tokens.size(); i++) {
+    ASSERT_EQ(expected_tokens.at(i), tokens->at(i));
+  }
+}
+
+INSTANTIATE_TEST_SUITE_P(
+    PunctuatorTest, TokenizeDetectPunctuatorTestFixture,
+    testing::Values(
+        std::make_tuple(std::vector{U'!'},
+                        std::vector{Token{.value_ = std::vector{U'!'},
+                                          .type_ = TokenType::PUNCTUATOR,
+                                          .ignored_ = false,
+                                          .line_ = 1,
+                                          .column_ = 1}}),
+        std::make_tuple(std::vector{U'$'},
+                        std::vector{Token{.value_ = std::vector{U'$'},
+                                          .type_ = TokenType::PUNCTUATOR,
+                                          .ignored_ = false,
+                                          .line_ = 1,
+                                          .column_ = 1}}),
+        std::make_tuple(std::vector{U'&'},
+                        std::vector{Token{.value_ = std::vector{U'&'},
+                                          .type_ = TokenType::PUNCTUATOR,
+                                          .ignored_ = false,
+                                          .line_ = 1,
+                                          .column_ = 1}}),
+        std::make_tuple(std::vector{U'('},
+                        std::vector{Token{.value_ = std::vector{U'('},
+                                          .type_ = TokenType::PUNCTUATOR,
+                                          .ignored_ = false,
+                                          .line_ = 1,
+                                          .column_ = 1}}),
+        std::make_tuple(std::vector{U')'},
+                        std::vector{Token{.value_ = std::vector{U')'},
+                                          .type_ = TokenType::PUNCTUATOR,
+                                          .ignored_ = false,
+                                          .line_ = 1,
+                                          .column_ = 1}}),
+        std::make_tuple(std::vector{U'.', U'.', U'.'},
+                        std::vector{
+                            Token{.value_ = std::vector{U'.', U'.', U'.'},
+                                  .type_ = TokenType::PUNCTUATOR,
+                                  .ignored_ = false,
+                                  .line_ = 1,
+                                  .column_ = 1}})));
